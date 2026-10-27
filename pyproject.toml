@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mechman-whatsapp-bot"
+version = "1.0.0"
+description = "Hard-coded WhatsApp enquiry and meeting-booking bot for Mechman Solutions"
+requires-python = ">=3.10"
+dependencies = [
+  "bcrypt>=4.1.0",
+  "fastapi>=0.115.0",
+  "neonize==0.5.2",
+  "python-jose[cryptography]>=3.3.0",
+  "python-multipart>=0.0.12",
+  "segno>=1.6.0",
+  "uvicorn[standard]>=0.32.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.28.0",
+  "pytest>=8.0",
+  "ruff>=0.11.0",
+]
+
+[project.scripts]
+mechman-bot = "mechman_bot.__main__:main"
+mechman-dashboard = "mechman_bot.web:run"
+
+[tool.setuptools.packages.find]
+include = ["mechman_bot*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
