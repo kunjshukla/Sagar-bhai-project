@@ -1,7 +1,6 @@
 # Mechman WhatsApp bot and meeting CRM
 
-A deterministic WhatsApp enquiry bot, custom meeting scheduler, and authenticated CRM dashboard for Mechman Solutions. The bot copy and routing are hard-coded from `mechmansolution.com`; no LLM is used at runtime.
-
+A deterministic WhatsApp enquiry bot, custom meeting scheduler, and authenticated CRM dashboard for Mechman Solutions. The bot copy and routing are hard-coded from `mechmansolution.com`; no LLM is used at runtime...
 ## Included
 
 - Natural A–F WhatsApp flow for Products, Services, Solutions, About, Contact, and Book a meeting.
