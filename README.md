@@ -77,8 +77,10 @@ Supported placeholders are `{name}`, `{date}`, `{time}`, `{minutes}`, and `{days
 | `NEONIZE_SESSION_DB` | `data/neonize-session.db` | Persistent linked-device credentials |
 | `BOT_DATABASE` | `data/mechman-bot.db` | Conversations, CRM, meetings, users, and history |
 | `PUBLIC_BOOKING_URL` | `http://localhost:5173/book` | Booking link sent by the bot |
+| `CORS_ORIGINS` | local Vite origins | Comma-separated dashboard origins allowed to call the API |
 | `JWT_SECRET` | none | Required; at least 32 characters |
 | `JWT_EXPIRE_MINUTES` | `720` | Dashboard session lifetime |
+| `DASHBOARD_AUTH_ENABLED` | `true` | Set to `false` only for a local dashboard demo without sign-in |
 | `ADMIN_USERNAME` | `admin` | Initial administrator username |
 | `ADMIN_PASSWORD` | none | Required; at least 10 characters |
 | `MEETING_DURATION_MINUTES` | `60` | Slot length: 30, 45, 60, 90, or 120 |
@@ -112,12 +114,44 @@ pytest
 cd portal && npm run build
 ```
 
+Seed five idempotent local demo records:
+
+```bash
+set -a
+source .env
+set +a
+.venv/bin/python scripts/seed_sample_data.py
+```
+
 ## Docker
 
 ```bash
 docker build -t mechman-crm .
 docker run --env-file .env -p 8000:8000 -v mechman-data:/app/data mechman-crm
 ```
+
+## Separate dashboard deployment
+
+The `portal/` directory can be deployed as a Vite project on Vercel. Set
+`VITE_API_URL` in Vercel to the public HTTPS URL of the FastAPI service, then add
+the Vercel site origin to `CORS_ORIGINS` on the backend. The backend still needs
+an always-on container host and a durable `/app/data` volume for SQLite and the
+WhatsApp session.
+
+For a same-computer demo with the backend kept local, install a trusted local
+certificate and run the API as a macOS per-user HTTPS service:
+
+```bash
+./scripts/install_local_https_demo.sh
+```
+
+The installer uses `mkcert`, serves FastAPI at `https://localhost:8443` in a
+detached `screen` session, updates Vercel's production `VITE_API_URL`, and
+redeploys the portal. Certificates and logs are stored under the ignored
+`data/local-https/` directory. The Vercel demo can reach this API only from this
+Mac because `localhost` resolves on the visitor's device. Restart the installer
+after reboot. Stop the service with
+`./scripts/uninstall_local_https_demo.sh`.
 
 ## Architecture
 

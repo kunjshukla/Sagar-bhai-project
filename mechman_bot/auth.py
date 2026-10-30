@@ -5,14 +5,15 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jwt import InvalidTokenError
 
 from .config import Settings
 
 ALGORITHM = "HS256"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
 
 def hash_password(raw: str) -> str:
@@ -38,12 +39,23 @@ def create_access_token(user_id: int, role: str, settings: Settings) -> str:
 def decode_access_token(token: str, settings: Settings) -> dict[str, object] | None:
     try:
         return jwt.decode(token, settings.jwt_secret, algorithms=[ALGORITHM])
-    except JWTError:
+    except InvalidTokenError:
         return None
 
 
 def current_user_dependency(settings: Settings, store):
-    def get_current_user(token: str = Depends(oauth2_scheme)) -> dict[str, object]:
+    def get_current_user(token: str | None = Depends(oauth2_scheme)) -> dict[str, object]:
+        if not settings.dashboard_auth_enabled:
+            user = store.get_user_by_username(settings.admin_username)
+            if user is None or not user["is_active"]:
+                raise HTTPException(status_code=503, detail="Demo administrator is unavailable")
+            return user
+        if not token:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         payload = decode_access_token(token, settings)
         if payload is None or not payload.get("sub"):
             raise HTTPException(

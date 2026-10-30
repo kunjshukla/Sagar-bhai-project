@@ -35,6 +35,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             hash_password(settings.admin_password),
         )
     pairing = PairingState(settings.bot_database.parent / "whatsapp-pairing-qr.png")
+    if not settings.whatsapp_autostart:
+        pairing.set_disconnected()
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -56,10 +58,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="Mechman CRM", version="2.0.0", lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+        allow_origins=list(settings.cors_origins),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        allow_private_network=True,
     )
     app.include_router(build_router(settings, store, pairing))
     app.state.settings = settings

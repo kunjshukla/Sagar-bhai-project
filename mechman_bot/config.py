@@ -20,6 +20,11 @@ class Settings:
     meeting_duration_minutes: int
     whatsapp_autostart: bool
     log_level: str
+    dashboard_auth_enabled: bool = True
+    cors_origins: tuple[str, ...] = (
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    )
 
     @classmethod
     def from_environment(cls) -> Settings:
@@ -40,6 +45,16 @@ class Settings:
             whatsapp_autostart=os.environ.get("WHATSAPP_AUTOSTART", "true").lower()
             in {"1", "true", "yes", "on"},
             log_level=os.environ.get("LOG_LEVEL", "INFO").upper(),
+            dashboard_auth_enabled=os.environ.get("DASHBOARD_AUTH_ENABLED", "true").lower()
+            in {"1", "true", "yes", "on"},
+            cors_origins=tuple(
+                origin.strip().rstrip("/")
+                for origin in os.environ.get(
+                    "CORS_ORIGINS",
+                    "http://localhost:5173,http://127.0.0.1:5173",
+                ).split(",")
+                if origin.strip()
+            ),
         )
 
     def ensure_directories(self) -> None:
@@ -53,6 +68,8 @@ class Settings:
             raise ValueError("ADMIN_PASSWORD must be at least 10 characters")
         if self.meeting_duration_minutes not in {30, 45, 60, 90, 120}:
             raise ValueError("MEETING_DURATION_MINUTES must be 30, 45, 60, 90, or 120")
+        if any(not origin.startswith(("http://", "https://")) for origin in self.cors_origins):
+            raise ValueError("CORS_ORIGINS must contain comma-separated HTTP(S) origins")
 
 
 def _digits_only(value: str) -> str:

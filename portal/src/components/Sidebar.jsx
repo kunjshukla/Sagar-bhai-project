@@ -1,4 +1,4 @@
-import { BarChart3, CalendarDays, ContactRound, LogOut, MessageCircle, Settings } from 'lucide-react'
+import { BarChart3, CalendarDays, ContactRound, MessageCircle, Settings } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -11,7 +11,7 @@ const links = [
 ]
 
 export default function Sidebar({ onNavigate }) {
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   return (
     <div className="sidebar">
       <div className="brand"><div className="brand-mark">MS</div><div><strong>Mechman</strong><span>Meeting CRM</span></div></div>
@@ -25,7 +25,6 @@ export default function Sidebar({ onNavigate }) {
       </nav>
       <div className="sidebar-footer">
         <div className="user-block"><span>{user?.full_name}</span><small>{user?.role}</small></div>
-        <button className="nav-link danger" onClick={logout}><LogOut size={18} />Sign out</button>
       </div>
     </div>
   )

@@ -23,15 +23,14 @@ def main_menu(name: str = "") -> str:
     greeting = f"Hi {name.strip().split()[0]}" if name.strip() else "Hi"
     return (
         f"{greeting} 👋 Welcome to Mechman Solutions.\n\n"
-        "We help manufacturers choose, implement, and get real results from Autodesk CAD/CAM "
-        "software. What would you like to explore?\n\n"
+        "How can we help?\n\n"
         "A - Products\n"
         "B - Services\n"
         "C - Solutions for your shop\n"
         "D - About Mechman\n"
         "E - Contact us\n"
         "F - Book a meeting\n\n"
-        "Reply with a letter, or simply tell me what you are trying to design, program, or improve."
+        "Reply A-F or type your question."
     )
 
 

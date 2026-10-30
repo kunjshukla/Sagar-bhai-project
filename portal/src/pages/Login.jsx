@@ -1,10 +1,10 @@
 import { AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
-  const { login } = useAuth()
+  const { login, user, loading } = useAuth()
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -17,6 +17,9 @@ export default function Login() {
     catch (requestError) { setError(requestError.response?.data?.detail || 'Unable to sign in') }
     finally { setBusy(false) }
   }
+
+  if (loading) return <div className="screen-center">Loading dashboard…</div>
+  if (user) return <Navigate to="/" replace />
 
   return (
     <div className="login-shell">
