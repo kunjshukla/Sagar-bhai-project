@@ -8,7 +8,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!getToken()) { setLoading(false); return }
     api.get('/api/auth/me').then(({ data }) => setUser(data)).catch(() => clearToken()).finally(() => setLoading(false))
   }, [])
 

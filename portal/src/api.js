@@ -5,7 +5,13 @@ export const getToken = () => localStorage.getItem(TOKEN_KEY)
 export const setToken = (value) => localStorage.setItem(TOKEN_KEY, value)
 export const clearToken = () => localStorage.removeItem(TOKEN_KEY)
 
-const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '' })
+export const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+const usesLoopbackApi = /^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])(?::|\/|$)/.test(API_BASE_URL)
+const transport = usesLoopbackApi
+  ? { adapter: 'fetch', fetchOptions: { targetAddressSpace: 'loopback' } }
+  : {}
+
+const api = axios.create({ baseURL: API_BASE_URL, ...transport })
 api.interceptors.request.use((config) => {
   const token = getToken()
   if (token) config.headers.Authorization = `Bearer ${token}`
@@ -22,5 +28,5 @@ api.interceptors.response.use(
   },
 )
 
-export const publicApi = axios.create({ baseURL: import.meta.env.VITE_API_URL || '' })
+export const publicApi = axios.create({ baseURL: API_BASE_URL, ...transport })
 export default api
